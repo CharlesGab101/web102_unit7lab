@@ -1,16 +1,35 @@
 import { useState } from 'react'
 import './CreatePost.css'
+import { supabase } from '../client'
 
 const CreatePost = () => {
-
+    // 1. Keep your state at the top of the component
     const [post, setPost] = useState({title: "", author: "", description: ""})
+
+    // 2. Define your asynchronous createPost function inside the component
+    const createPost = async (event) => {
+        event.preventDefault();
+
+        // Inserts the current state values into your Supabase database
+        await supabase
+            .from('Posts')
+            .insert({
+                title: post.title, 
+                author: post.author, 
+                description: post.description
+            })
+            .select();
+        
+        // Redirects to the homepage after submitting
+        window.location = "/";
+    }
 
     const handleChange = (event) => {
         const {name, value} = event.target
-        setPost( (prev) => {
+        setPost((prev) => {
             return {
                 ...prev,
-                [name]:value,
+                [name]: value,
             }
         })
     }
@@ -30,7 +49,8 @@ const CreatePost = () => {
                 <textarea rows="5" cols="50" id="description" name="description" onChange={handleChange}>
                 </textarea>
                 <br/>
-                <input type="submit" value="Submit" />
+                
+                <input type="submit" value="Submit" onClick={createPost} />
             </form>
         </div>
     )
